@@ -1,10 +1,11 @@
+
 package Math;
 
 /**
  *
  * @author Willy Bazan
- * @date  
- * @time  hora
+ * @date   18/11/2019
+ * @time   10:45 am
  */
 public class Vector2D {
 	private double x,y;
@@ -40,39 +41,42 @@ public class Vector2D {
             }
            
             return this;
-           }
+        }
         
         public Vector2D normalize()
         {
-            return new Vector2D(x/getMagnitude(), y/getMagnitude());
+            double magnitude = getMagnitude(); //Para ahorrar tiempo ya que esto se esta llamando unas 60 veces por segundo
+            
+            return new Vector2D(x/magnitude, y/magnitude);
         }
         
         public double getMagnitude()
 	{
-		return Math.sqrt(x*x + y*y);
+            return Math.sqrt(x*x + y*y);
 	}
 	
 	public Vector2D setDirection(double angle)
 	{
-		return new Vector2D(Math.cos(angle)*getMagnitude(), Math.sin(angle)*getMagnitude());
+            double magnitude = getMagnitude();
+            return new Vector2D(Math.cos(angle)*magnitude, Math.sin(angle)*magnitude);
 	}
         
         //Modifica la magnitud del vector direccion (heading)
 	public double getX() {
-		return x;
+            return x;
 	}
 
 	public void setX(double x) {
-		this.x = x;
+            this.x = x;
 	}
 
 	public double getY() {
-		return y;
+            return y;
 	}
 
 	public void setY(double y) {
-		this.y = y;
+            this.y = y;
 	}
-	
-	
+
+
 }

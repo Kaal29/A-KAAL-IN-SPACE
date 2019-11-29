@@ -27,7 +27,7 @@ public abstract class GameObject {
 	
 	public abstract void draw(Graphics g);
 
-	public Vector2D getPosition() {
+	public Vector2D getPosition( ) {
 		return position;
 	}
 

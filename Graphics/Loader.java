@@ -5,7 +5,7 @@ package Graphics;
  *
  * @author Willy Bazan
  * @date   20/11/2019
- * @time   10:5 am
+ * @time   10:05 am
  */
 import java.awt.image.BufferedImage;
 import java.io.IOException;
