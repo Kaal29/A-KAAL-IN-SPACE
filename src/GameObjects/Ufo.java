@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import Constants.Constant;
 import Graphics.Assets;
+import Graphics.Sound;
 import Math.Vector2D;
 import States.GameState;
 
@@ -37,7 +38,11 @@ public class Ufo extends MovingObject
 
     //Para determinar el tiempo que el Ufo puede disparar
     private Chronometer fireRate;
-
+    
+    //Sonido del Ufo
+    private Sound shoot;
+    
+    
     public Ufo(Vector2D position, Vector2D velocity, double maxVel, BufferedImage texture,
                     ArrayList<Vector2D> path, GameState gameState) {
             super(position, velocity, maxVel, texture, gameState);
@@ -46,6 +51,7 @@ public class Ufo extends MovingObject
             following = true;
             fireRate = new Chronometer();
             fireRate.run(Constant.UFO_FIRE_RATE);
+            shoot = new Sound(Assets.ufoShoot);
     }
 
     /**
@@ -130,6 +136,7 @@ public class Ufo extends MovingObject
             //Circulo unitario
             if ( toPlayer.getX() <0)
                 currentAngle = -currentAngle + Math.PI;
+            
             //Modifico el vector toPlayer
             toPlayer = toPlayer.setDirection(currentAngle);
 
@@ -146,9 +153,16 @@ public class Ufo extends MovingObject
             gameState.getMovingObjects().add(0, laser);//Para que se dibuje antes que el ufo
 
             fireRate.run(Constant.UFO_FIRE_RATE);
+            shoot.play();
 
         }
-
+        
+        //Ya que el sonido demora mas de lo que suena 
+        if (shoot.getFramePosition()> 8500)
+        {  //La posicion total del sonido es 12000
+            shoot.stop();
+        }
+        
         angle += Constant.UFO_TURN_ANGLE;
 
         //Ya que esta clase tambien puede colisionar
@@ -156,6 +170,13 @@ public class Ufo extends MovingObject
         fireRate.update();
     }
 
+    @Override
+    public void destroy()
+    {
+        gameState.addScore(Constant.UFO_SCORE, position);
+        super.destroy();
+    }
+    
     //Para hacer que el Ufo le dispare al jugador
     @Override
     public void draw(Graphics g) 

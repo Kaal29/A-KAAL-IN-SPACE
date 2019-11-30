@@ -15,6 +15,7 @@ import java.awt.geom.AffineTransform;
 
 import Constants.Constant;
 import Graphics.Assets;
+import Graphics.Sound;
 import Input.KeyBoard;
 import Math.Vector2D;
 import States.GameState;
@@ -30,18 +31,52 @@ public class Player extends MovingObject
     //Objeto de la clase Chronometer
     private Chronometer fireRate;
     
+    //Para hacer que el jugador tenga oportunidad al iniciar 
+    private boolean spawing, visible;
+    //spawing para cuando esta parpadenado y no deveria detectar colisiones
+    //visible para saber cuando dibujar y no al jugador
+    
+    //Para hacer el parpadeo del jugador
+    private Chronometer spawnTime, flickerTime;
+    //spawnTine para el tiempo en que esta parpadeando
+    //flickerTime para el cambio entre visible y no visible
+    
+    //Para saber con que avatar estamos jugando
+    public static int avatar;
+    
+    //sound
+    private Sound shoot, loose;
+    
     public Player(Vector2D position, Vector2D velocity, double maxVel, BufferedImage texture, GameState gameState) {
                 super(position, velocity, maxVel, texture, gameState);
                 heading = new Vector2D(0, 1);
                 acceleration = new Vector2D();
                 fireRate = new Chronometer();
+                spawnTime = new Chronometer();
+                flickerTime =new Chronometer();
+                shoot = new Sound(Assets.playerShoot);
+                loose = new Sound(Assets.playerLoose);
 	}
     
     @Override
     public void update() 
     {
+        if ( !spawnTime.isRunning())
+        {
+            spawing = false;
+            visible = true;
+        }
         
-        if (KeyBoard.SHOOT && !fireRate.isRunning())
+        if (spawing)
+        {
+            if (!flickerTime.isRunning())
+            {
+                flickerTime.run(Constant.FLICKER_TIME);
+                visible = !visible; //De esta manera se consigue el efecto de parpadeo
+            }
+        }
+        
+        if (KeyBoard.SHOOT && !fireRate.isRunning() && !spawing)
         {
             //Mostrando el laser
             gameState.getMovingObjects().add( 0, new Laser( //el cero indica que este se ubica al fondo
@@ -53,8 +88,14 @@ public class Player extends MovingObject
                     gameState));
             
             fireRate.run(Constant.FIRERATE);
+            shoot.play();
         }
         
+        //Ya que el sonido demora mas de lo que suena 
+        if (shoot.getFramePosition()> 8500)
+        {  //La posicion totalñ del sonido es 12000
+            shoot.stop();
+        }
         if (KeyBoard.RIGHT)
             angle += Constant.DELTAANGLE;
         if (KeyBoard.LEFT)
@@ -96,12 +137,37 @@ public class Player extends MovingObject
            position.setY(Constant.HEIGHT-height);
         
         fireRate.update();
+        spawnTime.update();
+        flickerTime.update();
         collidesWith();
     }
 
+    //Para hacer que la variable spawing sea verdadera
+    @Override
+    public void destroy()
+    {
+        spawing = true;
+        spawnTime.run(Constant.SPAWING_TIME);
+        loose.play();
+        resetValues();
+        gameState.subtractLife();
+    }
+    
+    private void resetValues() {
+		
+        angle = 0;
+        velocity = new Vector2D();
+        position = new Vector2D(Constant.WIDTH/2 - Assets.players[Player.avatar].getWidth()/2,
+                        Constant.HEIGHT/2 - Assets.players[Player.avatar].getHeight()/2);
+	}
+    
     @Override
     public void draw(Graphics g) 
     {
+        if (!visible)
+            return;
+        
+        
 	Graphics2D g2d = (Graphics2D)g;
         
         //Parta indicar cuando debe o no cambiar de imagen
@@ -121,7 +187,6 @@ public class Player extends MovingObject
         {
             g2d.drawImage(Assets.speed, at1, null);
         }
-            
     }   
     
      //Devuelve el centro de la imagen 
@@ -131,5 +196,8 @@ public class Player extends MovingObject
         return new Vector2D(position.getX()+ width/2, position.getY()+ height/2);
     }
      
-    
+    public boolean isSpawing()
+    {
+        return spawing;
+    }
 }

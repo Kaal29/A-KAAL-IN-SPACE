@@ -13,16 +13,19 @@ public class Constant
     public static final int WIDTH = 1200, HEIGHT = 600;
     
     //Player properties
-    public static final int FIRERATE = 150 ; //Velocidad de disparo 300
+    public static final int FIRERATE = 300 ; //Cantidad de disparos
     public static final double ACC = 0.2; //0.2//Velocidad de movimiento
-    public static final double DELTAANGLE = 0.04; //Angulo de rotacion
+    public static final double DELTAANGLE = 0.05; //Angulo de rotacion
     public static final double PLAYER_MAX_VEL = 10; //Velocidad maxima de desplazamiento
-
+    public static final long SPAWING_TIME = 3000;
+    public static final long FLICKER_TIME = 200;  
+    
     //Laser properties
     public static final double LASER_VEL = 15;
     
     //Meteors properties
     public static final double METEOR_VEL = 5;
+    public static final int METEOR_SCORE = 20;
     
     //Ufo properties
     public static final int NODE_RADIUS = 100;
@@ -31,4 +34,5 @@ public class Constant
     public static final double UFO_TURN_ANGLE = 0.08;
     public static final int UFO_FIRE_RATE = 1000;
     public static final double UFO_ANGLE_RANGE = Math.PI/2;
+    public static final int UFO_SCORE = 40;
 }

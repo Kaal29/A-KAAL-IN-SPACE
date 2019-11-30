@@ -13,8 +13,10 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints; 
 import java.util.ArrayList;
 import java.awt.image.BufferedImage;
+import java.awt.Color;
 
 import Constants.Constant;
+import GameObjects.Message;
 import GameObjects.Meteor;
 import GameObjects.MovingObject;
 import GameObjects.Player;
@@ -22,6 +24,7 @@ import GameObjects.Size;
 import GameObjects.Ufo;
 import Graphics.Animation;
 import Graphics.Assets;
+import Graphics.Sound;
 import Math.Vector2D;
 
 
@@ -33,24 +36,41 @@ public class GameState
     //crear un arreglo del tipo MovingObject
     private ArrayList<MovingObject> movingObjects= new ArrayList<MovingObject>();
     private ArrayList<Animation> explosions = new ArrayList<Animation>();
-
+    private ArrayList<Message> messages = new ArrayList<Message>();
+    
     //Variable que representa la cantidad de meteoros iniciales en cada oleada 
     private int meteors;
 
+    //Puntaje del jugador
+    private int score=0;
+    private int lives = 3;
+    
+    private int waves = 1;
+    
+    private Sound backgroundMusic;
 
     public GameState()
     {
+        Player.avatar = (int)(Math.random()*Assets.players.length);
         //player = new Player(new Vector2D(400, 250), new Vector2D(0,0), 7, Assets.player, this);
-        player = new Player(new Vector2D(Constant.WIDTH/2 - Assets.player.getWidth()/2,
-				Constant.HEIGHT/2 - Assets.player.getHeight()/2), new Vector2D(),
-				Constant.PLAYER_MAX_VEL, Assets.player, this);
+        player = new Player(new Vector2D(Constant.WIDTH/2 - Assets.players[Player.avatar].getWidth()/2,
+				Constant.HEIGHT/2 - Assets.players[Player.avatar].getHeight()/2), new Vector2D(),
+				Constant.PLAYER_MAX_VEL, Assets.players[Player.avatar], this);
         
         //Agregamos al jugador en la clase objetos Moviles
         movingObjects.add(player);
 
         meteors = 1;
-
         startWave();
+        backgroundMusic = new Sound(Assets.backgroundMusic);
+        backgroundMusic.loop();
+    }
+    
+    
+    public void addScore( int value, Vector2D position ) //Esta posicion es del objeto que se destruyo
+    {
+        score += value;
+        messages.add(new Message(position, true, "+"+value+" score", Color.WHITE, false, Assets.fontMed, this));
     }
 
     //Para dividir los meteoros
@@ -97,6 +117,8 @@ public class GameState
     //Inicia cada ronda de meteoros
     private void startWave()
     {
+        messages.add(new Message( new Vector2D(Constant.WIDTH/2, Constant.HEIGHT/2), true,
+                    "WAVE "+ waves, Color.ORANGE, true, Assets.fontBig, this)); 
         double x, y;
         
         for ( int i=0; i < meteors; i++)
@@ -118,11 +140,11 @@ public class GameState
 
         meteors ++;
         spawnUfo();
+        waves++;
     }
     //Agregar animaciones a un arreglo
     public void playExplosion(Vector2D position)
     {
-
         explosions.add(new Animation(
                     Assets.exp,
                     50, //Tiempo que dura una explosion
@@ -176,9 +198,6 @@ public class GameState
                 this  //estado de juego
                 ));
             
-        
-        
-            
     }
     
     
@@ -220,7 +239,12 @@ public class GameState
         //Para evitar que la imagen se vea pixelada
         Graphics2D g2d = (Graphics2D)g;
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-
+        
+        for ( int i=0; i< messages.size(); i++ )
+        {
+            messages.get(i).draw(g2d);
+        }
+        
         for ( int i=0; i< movingObjects.size(); i++ )
         {
             movingObjects.get(i).draw(g);
@@ -232,9 +256,55 @@ public class GameState
             Animation anim = explosions.get(i);
             g2d.drawImage(anim.getCurrentFrame(),(int)(anim.getPosition().getX()), (int)(anim.getPosition().getY()), null);
         }
-
+        
+        drawScore(g);
+        drawLives(g);
+        //Text.drawText(g, "WAVE " + waves, new Vector2D( Constant.WIDTH/2 , Constant.HEIGHT/2), 
+               // true, Color.yellow, Assets.fontBig);
     }
 
+    //para mostrar el score
+    private void drawScore(Graphics g)
+    {
+        Vector2D pos = new Vector2D(Constant.WIDTH-75, 25);
+
+        String scoreToString = Integer.toString(score);
+
+        for(int i = 0; i < scoreToString.length(); i++) 
+        {
+            g.drawImage(Assets.numbers[Integer.parseInt(scoreToString.substring(i, i + 1))],
+                            (int)pos.getX(), (int)pos.getY(), null);
+            pos.setX(pos.getX() + 20);
+        }
+    }
+    
+    private void drawLives(Graphics g)
+    {
+        Vector2D livePosition = new Vector2D(25, 25);
+
+        g.drawImage(Assets.life, (int)livePosition.getX(), (int)livePosition.getY(), null);
+
+        g.drawImage(Assets.numbers[10], (int)livePosition.getX() + 40,
+                        (int)livePosition.getY() + 5, null);
+
+        String livesToString = Integer.toString(lives);
+
+        Vector2D pos = new Vector2D(livePosition.getX(), livePosition.getY());
+
+        for(int i = 0; i < livesToString.length(); i ++)
+        {
+            int number = lives;
+
+            if(number <= 0) //Comprobando que el numero de vidas sea mayor que cero 
+                break;
+            
+            g.drawImage(Assets.numbers[number],
+                            (int)pos.getX() + 60, (int)pos.getY() + 5, null);
+            pos.setX(pos.getX() + 20);
+        }
+
+}
+    
     public ArrayList<MovingObject> getMovingObjects() 
     {
         return movingObjects;
@@ -244,4 +314,14 @@ public class GameState
     {
         return player;
     }
+    
+    public void subtractLife()
+    {
+        lives--;
+    }
+
+    public ArrayList<Message> getMessages() {
+        return messages;
+    }
+    
 }

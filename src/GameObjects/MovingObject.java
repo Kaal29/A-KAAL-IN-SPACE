@@ -10,6 +10,8 @@ package GameObjects;
  * @time   05:24 pm
  */
 
+import Graphics.Assets;
+import Graphics.Sound;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -27,6 +29,8 @@ public abstract class MovingObject extends GameObject
     protected int height;
     protected GameState gameState; //Para que cada objeto de MovingObjevt tenga acceso a GameState
     
+    private Sound explosion;
+    
     public MovingObject(Vector2D position, Vector2D velocity, double maxVel, BufferedImage texture, GameState gameState) 
     {
         super(position, texture);
@@ -36,6 +40,7 @@ public abstract class MovingObject extends GameObject
         width = texture.getWidth();
         height = texture.getHeight();
         angle = 0;
+        explosion = new Sound( Assets.explosion );
         
     }
     
@@ -65,7 +70,17 @@ public abstract class MovingObject extends GameObject
     }
     
     private void objectCollision( MovingObject a, MovingObject b)
-    {
+    {   //Si algunos de estos objetos es el jugador y si la variable spawing es verdadera
+        if ( a instanceof Player &&((Player)a).isSpawing())
+        {
+            return;
+        }
+        
+        if ( b instanceof Player &&((Player)b).isSpawing())
+        {
+            return;
+        }
+        
         //Si a no es un meteoro
         if ( !(a instanceof Meteor && b instanceof Meteor))
         {
@@ -79,6 +94,10 @@ public abstract class MovingObject extends GameObject
     protected void destroy()
     {
         gameState.getMovingObjects().remove(this);
+        if ( !(this instanceof Laser))
+        {
+            explosion.play();
+        }
     }
     
     protected Vector2D getCenter()
