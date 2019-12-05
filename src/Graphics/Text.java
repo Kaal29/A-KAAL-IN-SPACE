@@ -7,10 +7,14 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 
 /**
- *
- * @author Willy Bazan
- * @date   30/11/2019
- * @time   09:45 am
+ * PERMITE OBSERVAR LA PUNTUACION 
+ * @author ***
+ * @date   ***
+ * @time   ***
+ * 
+ * @adapted by Willy Bazan
+ * @date    30/11/2019
+ * @time    09:45 am
  */
 
 import Math.Vector2D;
@@ -27,7 +31,6 @@ public class Text
                 FontMetrics fm = g.getFontMetrics();
                 position.setX(position.getX() - fm.stringWidth(text) / 2);
                 position.setY(position.getY() - fm.getHeight() / 2);
-
         }
 
         g.drawString(text, (int)position.getX(), (int)position.getY());

@@ -14,13 +14,16 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
-
 import javax.swing.JFrame;
 
 import Constants.Constant;
 import Graphics.Assets;
 import Input.KeyBoard;
+import Input.MouseInput;
 import States.GameState;
+import States.MenuState;
+
+import States.State;
 
 public class Window extends JFrame implements Runnable{
 	
@@ -38,19 +41,24 @@ public class Window extends JFrame implements Runnable{
     private double delta = 0;
     private int AVERAGEFPS = FPS;
 
-    private GameState gameState;
+    private int numberScreen;
+    
     private KeyBoard keyBoard;
+    
+    private MouseInput mouseInput;
     
     public Window()
     {
+         numberScreen = (int)(Math.random()*Assets.screens.length);
         setTitle("IRONMAN KAAL");
         setSize(Constant.WIDTH, Constant.HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
         setLocationRelativeTo(null);
-
+        
         canvas = new Canvas();
         keyBoard = new KeyBoard();
+        mouseInput = new MouseInput();
         
         canvas.setPreferredSize(new Dimension(Constant.WIDTH, Constant.HEIGHT));
         canvas.setMaximumSize(new Dimension(Constant.WIDTH, Constant.HEIGHT));
@@ -59,24 +67,21 @@ public class Window extends JFrame implements Runnable{
 
         add(canvas);
         canvas.addKeyListener(keyBoard);
-        
+        canvas.addMouseListener(mouseInput); //Y con esto nuestra clase ya recibe los eventos del mouse
+        canvas.addMouseMotionListener(mouseInput);
         //Esta debe de ser la ultima linea 
         //De lo contrario a veces la pantalla carga en blanco
         setVisible(true);
     }
 
-
-
     public static void main(String[] args) {
             new Window().start();
-
     }
-
 
     private void update()
     {
         keyBoard.update();
-        gameState.update();
+        State.getCurrentState().update();
     }
 
     private void draw(){
@@ -92,13 +97,13 @@ public class Window extends JFrame implements Runnable{
 
             //-----------------------
 
-            g.setColor(Color.DARK_GRAY);
+            g.setColor(Color.BLACK);
+            
+            g.drawImage(Assets.screens[numberScreen], 0, 0, Constant.WIDTH, Constant.HEIGHT, this); //Para ajustar la imagen al tamaño de la pantalla
+            
+            State.getCurrentState().draw(g); //Y ya con esto se esta dibujando siempre el estdo actual
 
-            g.fillRect(0, 0, Constant.WIDTH, Constant.HEIGHT);
-
-            gameState.draw(g);
-
-            g.drawString(""+AVERAGEFPS, 10, 20);
+            //g.drawString(""+AVERAGEFPS, 10, 20);
 
             //---------------------
             g.dispose();
@@ -108,10 +113,14 @@ public class Window extends JFrame implements Runnable{
     private void init()
     {
             Assets.init();
-            gameState = new GameState();
+            
+            //De la clase State su objeto empieza siendo nulo
+            //entonces
+            //Sirve para hacer modificaciones sin meternos con la logica del juego
+            State.changeState(new MenuState());
+                    
     }
-
-
+    
     @Override
     public void run() {
 
@@ -144,7 +153,7 @@ public class Window extends JFrame implements Runnable{
                     }
 
             }
-
+            
             stop();
     }
 
@@ -153,9 +162,8 @@ public class Window extends JFrame implements Runnable{
             thread = new Thread(this);
             thread.start();
             running = true;
-
-
     }
+    
     private void stop(){
             try {
                     thread.join();

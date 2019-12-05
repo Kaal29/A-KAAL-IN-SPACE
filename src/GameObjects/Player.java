@@ -1,4 +1,4 @@
-
+ 
 package GameObjects;
 
 /**
@@ -84,7 +84,7 @@ public class Player extends MovingObject
                     heading,
                     Constant.LASER_VEL, 
                     angle,
-                    Assets.blueLaser, 
+                    Assets.lasers[0], 
                     gameState));
             
             fireRate.run(Constant.FIRERATE);
@@ -125,16 +125,16 @@ public class Player extends MovingObject
         position = position.add(velocity);
         
         if (position.getX() > Constant.WIDTH-width)
-           position.setX(0);
-        
-        if (position.getY() > Constant.HEIGHT-height)
-           position.setY(0);
-        
-        if (position.getX() < 0)
            position.setX(Constant.WIDTH-width);
         
-        if (position.getY() < 0)
+        if (position.getY() > Constant.HEIGHT-height)
            position.setY(Constant.HEIGHT-height);
+        
+        if (position.getX() < 0)
+           position.setX(0);
+        
+        if (position.getY() < 0)
+           position.setY(0);
         
         fireRate.update();
         spawnTime.update();
@@ -149,8 +149,14 @@ public class Player extends MovingObject
         spawing = true;
         spawnTime.run(Constant.SPAWING_TIME);
         loose.play();
+        if ( !(gameState.subtractLife()))
+        {
+            gameState.gameOver();
+            
+            super.destroy();
+        }
+            
         resetValues();
-        gameState.subtractLife();
     }
     
     private void resetValues() {
@@ -167,7 +173,6 @@ public class Player extends MovingObject
         if (!visible)
             return;
         
-        
 	Graphics2D g2d = (Graphics2D)g;
         
         //Parta indicar cuando debe o no cambiar de imagen
@@ -175,18 +180,22 @@ public class Player extends MovingObject
         //at es stop
         at = AffineTransform.getTranslateInstance(position.getX(), position.getY());
         at.rotate(angle, width/2, height/2); 
-        if (!accelerating)
-        {
-            g2d.drawImage(texture, at, null);
-        }
-            
-        //at1 es Vuelo
-        AffineTransform at1 = AffineTransform.getTranslateInstance(position.getX(), position.getY());
-        at1.rotate(angle, width/2, height/2); //Tenemos que pasar el punto de rotacion y el angulo
+        
+        //at1 es efecto del vuelo 
+        AffineTransform at1 = AffineTransform.getTranslateInstance(position.getX()+width/2-20, position.getY()+height);
+         //Es necesario restar los numeros que agregamos a la posicion para que el giro no se altere
+        at1.rotate(angle,20,-height/2); //Tenemos que pasar el punto de rotacion y el angulo
+       
         if (accelerating)
         {
             g2d.drawImage(Assets.speed, at1, null);
         }
+        
+        //at es stop
+        at = AffineTransform.getTranslateInstance(position.getX(), position.getY());
+        at.rotate(angle, width/2, height/2); 
+        
+        g2d.drawImage(texture, at, null);
     }   
     
      //Devuelve el centro de la imagen 

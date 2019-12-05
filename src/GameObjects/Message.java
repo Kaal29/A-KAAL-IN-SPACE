@@ -21,7 +21,7 @@ import java.awt.Graphics2D;
  */
 public class Message 
 {
-    private GameState gameState;
+    //private GameState gameState;
     private float alpha;
     private String text; //Para el texto
     private Vector2D position;
@@ -30,11 +30,12 @@ public class Message
     private boolean fade; //Efecto de aparecer <- contrario de fade
     private Font font;
     private final float deltaAlpha = 0.01f; //Mientras mas rapido mas rapido de desvanece
-	
+    private boolean dead;
+        
     public Message(Vector2D position, boolean fade, String text, Color color,
                     boolean center, Font font, GameState gameState) {
             this.font = font;
-            this.gameState = gameState;
+            //this.gameState = gameState; rfeamplasa la variable dead
             this.text = text;
             this.position = position;
             this.fade = fade;
@@ -64,13 +65,16 @@ public class Message
                 alpha += deltaAlpha;
 
         if(fade && alpha < 0) {
-            gameState.getMessages().remove(this); //Para eliminar mensaje
+            dead = true; //gameState.getMessages().remove(this); //Para eliminar mensaje
         }
 
         if(!fade && alpha > 1) {
                 fade = true;
                 alpha = 1;
         }
-		
+
     }
+    
+    public boolean isDead() {return dead;}
+    
 }

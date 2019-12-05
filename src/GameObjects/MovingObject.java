@@ -1,8 +1,6 @@
 
 package GameObjects;
 
-
-
 /**
  *
  * @author Willy Bazan
@@ -30,6 +28,8 @@ public abstract class MovingObject extends GameObject
     protected GameState gameState; //Para que cada objeto de MovingObjevt tenga acceso a GameState
     
     private Sound explosion;
+    
+    private boolean dead;  //Bandera que indica si el objeto fue destruido o no
     
     public MovingObject(Vector2D position, Vector2D velocity, double maxVel, BufferedImage texture, GameState gameState) 
     {
@@ -62,16 +62,22 @@ public abstract class MovingObject extends GameObject
         
             //Cuando os objetos colisionen van a ser destruidos
             //con excepcion de los meteoros que colisinen entre si
-            if ( distance< m.width/2+width/2 && movingObjects.contains(this))
+            if ( distance< m.width/2+width/2 && movingObjects.contains(this) && !m.dead && !dead) //Para evitar parpadeos (m.dead) (errores)
             {
                 objectCollision(m, this);
             }  
         }
     }
     
+    //Se cambia la eficiencia de la destruccion de objetos ya que se estaba buscando n^2 veces para vorrar los n objetos del juego 
+    //Para esto se creo el booleano dead y esto se veflejado en Movingobject en GameState en update() y luego ver el condicional en collideWith de esta clase el m.dead()
     private void objectCollision( MovingObject a, MovingObject b)
     {   //Si algunos de estos objetos es el jugador y si la variable spawing es verdadera
         if ( a instanceof Player &&((Player)a).isSpawing())
+        {
+            return;
+        }
+        if ( a instanceof Ufo )
         {
             return;
         }
@@ -80,6 +86,8 @@ public abstract class MovingObject extends GameObject
         {
             return;
         }
+        
+        
         
         //Si a no es un meteoro
         if ( !(a instanceof Meteor && b instanceof Meteor))
@@ -93,7 +101,13 @@ public abstract class MovingObject extends GameObject
     //Metodo para eliminarlos objetos destruidos
     protected void destroy()
     {
-        gameState.getMovingObjects().remove(this);
+        dead = true;
+        
+        
+        //PROBLEMA ENCONTRADO!!!!
+        //gameState.getMovingObjects().remove(this);
+        
+        
         if ( !(this instanceof Laser))
         {
             explosion.play();
@@ -105,4 +119,5 @@ public abstract class MovingObject extends GameObject
         return new Vector2D(position.getX() + width/2, position.getY() + height/2 );
     }
 
+    public boolean isDead() {return dead;}
 }

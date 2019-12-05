@@ -13,14 +13,19 @@ import javax.imageio.ImageIO;
 import java.awt.Font;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.AudioSystem;
+import javax.swing.ImageIcon;
 
 import java.io.IOException;
 import java.awt.FontFormatException;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+
+
 public class Loader 
 {
+    
+    
     //Para cargar las imagenes principales
     public static BufferedImage ImageLoader(String path)
     {

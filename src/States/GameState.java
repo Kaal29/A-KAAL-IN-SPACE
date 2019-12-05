@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.awt.Color;
 
 import Constants.Constant;
+import GameObjects.Chronometer;
 import GameObjects.Message;
 import GameObjects.Meteor;
 import GameObjects.MovingObject;
@@ -28,9 +29,13 @@ import Graphics.Sound;
 import Math.Vector2D;
 
 
-public class GameState 
-{
-	
+public class GameState extends State //Este cambio se hizo para tener el control                                      
+{                                      //de manera directa del juego y no comprometernos con su logica al momento de crear la interfaz
+    
+    
+    public static final Vector2D PLAYER_START_POSITION = new Vector2D(Constant.WIDTH/2 - Assets.players[0].getWidth()/2,
+			Constant.HEIGHT/2 - Assets.players[0].getHeight()/2);
+    
     private Player player;
 
     //crear un arreglo del tipo MovingObject
@@ -43,29 +48,47 @@ public class GameState
 
     //Puntaje del jugador
     private int score=0;
-    private int lives = 3;
+    private int lives = 10;
     
     private int waves = 1;
     
     private Sound backgroundMusic;
-
+    
+    private Chronometer ufoSpawner;
+    private Chronometer gameOverTimer;
+    private boolean gameOver;
+    
     public GameState()
     {
+        //Eligimos los avatares 
         Player.avatar = (int)(Math.random()*Assets.players.length);
+        
         //player = new Player(new Vector2D(400, 250), new Vector2D(0,0), 7, Assets.player, this);
         player = new Player(new Vector2D(Constant.WIDTH/2 - Assets.players[Player.avatar].getWidth()/2,
 				Constant.HEIGHT/2 - Assets.players[Player.avatar].getHeight()/2), new Vector2D(),
 				Constant.PLAYER_MAX_VEL, Assets.players[Player.avatar], this);
         
+        gameOverTimer = new Chronometer();
+	gameOver = false;
+                
         //Agregamos al jugador en la clase objetos Moviles
         movingObjects.add(player);
 
         meteors = 1;
         startWave();
+        
         backgroundMusic = new Sound(Assets.backgroundMusic);
+        
+        //Para la musica de fondo
         backgroundMusic.loop();
+        //Para controlar el volumen de la musica de fondo [-80;6.02]
+        backgroundMusic.changeVolumeFloat((int) -10f);
+        
+        //Para crear los Ufo cada 10 segundos
+        ufoSpawner = new Chronometer();
+        ufoSpawner.run(Constant.UFO_SPAWN_RATE);
     }
-    
+
     
     public void addScore( int value, Vector2D position ) //Esta posicion es del objeto que se destruyo
     {
@@ -93,9 +116,9 @@ public class GameState
             case MED:
                 newSize = Size.SMALL;
                 break;
-            case SMALL:
-                newSize = Size.TINY;
-                break;
+            //case SMALL:
+               // newSize = Size.TINY;
+                //break;
             default:
                 return;
         }
@@ -155,6 +178,8 @@ public class GameState
     //Nos permite crear un Ufo
     private void spawnUfo()
     {
+        Ufo.enemy = (int)(Math.random()*Assets.ufo.length);
+        
         int rand = (int)(Math.random()*2);
 
         //Le damos una posicion inicial
@@ -187,8 +212,6 @@ public class GameState
         posY = Math.random()*(Constant.HEIGHT/2) + Constant.HEIGHT/2;	
         path.add(new Vector2D(posX, posY));
 
-        Ufo.enemy = (int)(Math.random()*Assets.ufo.length);
-        
         movingObjects.add(new Ufo(   //Luego se agrega todo arreglo de objetos moviles 
                 new Vector2D(x, y),
                 new Vector2D(), //La velocidad puede ser un vector velocidad cero, esto no importa ya que hay aceleracion
@@ -200,13 +223,22 @@ public class GameState
             
     }
     
-    
+    @Override
     public void update()
     {
-
         for ( int i=0; i< movingObjects.size(); i++ )
         {
-            movingObjects.get(i).update();
+            
+            MovingObject movingObject = movingObjects.get(i);
+
+            movingObject.update();
+            
+            if(movingObject.isDead()) {
+                movingObjects.remove(i); //Y aqui es el incremento de eficiencia cuando 
+                                         //ya se esta pasando el índice del objeto a destruir   //CAP-21
+                i--;
+            }
+
         }
 
         //Para actualizar las animaciones
@@ -221,6 +253,19 @@ public class GameState
             }
         }
 
+        if(gameOver && !gameOverTimer.isRunning()) 
+        {
+            State.changeState(new MenuState());
+	}
+        
+        if(!ufoSpawner.isRunning()) {
+            ufoSpawner.run(Constant.UFO_SPAWN_RATE);
+            spawnUfo(); //Como para aumentar la dificultad al juego
+	}
+        
+        gameOverTimer.update();
+	ufoSpawner.update();
+                
         for ( int i=0; i< movingObjects.size(); i++ )
         {
             if (movingObjects.get(i) instanceof Meteor) //Con esto se pregunta si el objeto movible es un objeto de la clase meteoro
@@ -234,6 +279,7 @@ public class GameState
 
     }
 
+    @Override
     public void draw(Graphics g)
     {
         //Para evitar que la imagen se vea pixelada
@@ -243,6 +289,10 @@ public class GameState
         for ( int i=0; i< messages.size(); i++ )
         {
             messages.get(i).draw(g2d);
+            if (messages.get(i).isDead())
+            {
+                messages.remove(i);
+            }
         }
         
         for ( int i=0; i< movingObjects.size(); i++ )
@@ -280,6 +330,9 @@ public class GameState
     
     private void drawLives(Graphics g)
     {
+        if ( lives<1)
+            return;
+        
         Vector2D livePosition = new Vector2D(25, 25);
 
         g.drawImage(Assets.life, (int)livePosition.getX(), (int)livePosition.getY(), null);
@@ -293,7 +346,7 @@ public class GameState
 
         for(int i = 0; i < livesToString.length(); i ++)
         {
-            int number = lives;
+            int number = lives ; //Integer.parseInt(livesToString.substring(i,i+1));
 
             if(number <= 0) //Comprobando que el numero de vidas sea mayor que cero 
                 break;
@@ -315,11 +368,28 @@ public class GameState
         return player;
     }
     
-    public void subtractLife()
+    public boolean subtractLife()
     {
         lives--;
+        return lives>0;
     }
 
+    public void gameOver()
+    {
+        Message gameOverMsg = new Message(
+                PLAYER_START_POSITION,
+                true,
+                "GAMEOVER",
+                Color.MAGENTA,
+                true,
+                Assets.fontBig,
+                this);
+        
+        this.messages.add(gameOverMsg);
+        gameOverTimer.run(Constant.GAME_OVER_TIME);
+        gameOver = true;
+    }
+    
     public ArrayList<Message> getMessages() {
         return messages;
     }

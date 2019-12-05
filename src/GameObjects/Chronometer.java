@@ -16,7 +16,7 @@ public class Chronometer
     public Chronometer() 
     {
         delta = 0;
-        lastTime = 0;
+        lastTime = System.currentTimeMillis(); //Estaba en 0 pero deveria ser de esta forma para leer el timpo actual 
         running = false;
     }
     

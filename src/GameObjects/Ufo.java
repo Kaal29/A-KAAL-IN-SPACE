@@ -146,7 +146,7 @@ public class Ufo extends MovingObject
                     toPlayer,
                     Constant.LASER_VEL,
                     currentAngle + Math.PI/2, //Ya que el laser ya viene a 90 grados
-                    Assets.redLaser,
+                    Assets.lasers[(int)(Math.random()*(Assets.lasers.length-1))+1],
                     gameState
                     );
 

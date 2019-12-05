@@ -40,6 +40,7 @@ public class Vector2D {
 
     public Vector2D limit(double value)
     {
+        //esto es para evitar que la nave empiece hacer una "curva"
         if (getMagnitude()> value)
         {
             return this.normalize().scale(value);
