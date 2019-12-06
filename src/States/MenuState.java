@@ -2,7 +2,7 @@
 package States;
 
 /**
- *
+ * CREA LA INTERFAZ
  * @author Willy Bazan
  * @date   04/12/2019
  * @time   09:39 pm
@@ -27,7 +27,7 @@ public class MenuState extends State{
                         Assets.greyBtn,
                         Assets.blueBtn,
                         Constant.WIDTH / 2 - Assets.greyBtn.getWidth()/2,
-                        Constant.HEIGHT / 2 - Assets.greyBtn.getHeight(),
+                        Constant.HEIGHT / 2 - Assets.greyBtn.getHeight()*4,
                         Constant.PLAY,
                         new Action() {
                                 @Override
@@ -37,11 +37,27 @@ public class MenuState extends State{
                         }
                         ));
 
+        //***********************************************************************************
+        buttons.add(new Button(
+				Assets.greyBtn,
+				Assets.blueBtn,
+				Constant.WIDTH / 2 - Assets.greyBtn.getWidth()/2,
+				Constant.HEIGHT / 2 - Assets.greyBtn.getHeight()*2,
+				Constant.OPTIONS,
+				new Action() {
+					@Override
+					public void doAction() {
+						State.changeState(new ChooseShip());
+					}
+				}
+				));
+        
+        //***********************************************************************************
         buttons.add(new Button(
                         Assets.greyBtn,
                         Assets.blueBtn,
                         Constant.WIDTH / 2 - Assets.greyBtn.getWidth()/2,
-                        Constant.HEIGHT / 2 + Assets.greyBtn.getHeight()/2 ,
+                        Constant.HEIGHT / 2 + Assets.greyBtn.getHeight()*2 ,
                         Constant.EXIT,
                         new Action() {
                                 @Override
@@ -50,6 +66,20 @@ public class MenuState extends State{
                                 }
                         }
                         ));
+        
+        buttons.add(new Button(
+				Assets.greyBtn,
+				Assets.blueBtn,
+				Constant.WIDTH / 2 - Assets.greyBtn.getWidth()/2,
+				Constant.HEIGHT / 2,
+				Constant.HIGH_SCORES,
+				new Action() {
+					@Override
+					public void doAction() {
+						State.changeState(new ScoreState());
+					}
+				}
+				));
 
     }
 
@@ -57,14 +87,14 @@ public class MenuState extends State{
     @Override
     public void update() {
         for(Button b: buttons) {
-                b.update();
+            b.update();
         }
     }
 
     @Override
     public void draw(Graphics g) {
         for(Button b: buttons) {
-                b.draw(g);
+            b.draw(g);
         }
     }
 

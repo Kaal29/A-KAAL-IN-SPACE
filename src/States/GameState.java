@@ -33,8 +33,8 @@ public class GameState extends State //Este cambio se hizo para tener el control
 {                                      //de manera directa del juego y no comprometernos con su logica al momento de crear la interfaz
     
     
-    public static final Vector2D PLAYER_START_POSITION = new Vector2D(Constant.WIDTH/2 - Assets.players[0].getWidth()/2,
-			Constant.HEIGHT/2 - Assets.players[0].getHeight()/2);
+    public static final Vector2D PLAYER_START_POSITION = new Vector2D(Constant.WIDTH/2 - Assets.players[ChooseShip.avatar].getWidth()/2,
+			Constant.HEIGHT/2 - Assets.players[ChooseShip.avatar].getHeight()/2);
     
     private Player player;
 
@@ -48,7 +48,7 @@ public class GameState extends State //Este cambio se hizo para tener el control
 
     //Puntaje del jugador
     private int score=0;
-    private int lives = 10;
+    private int lives = 5;
     
     private int waves = 1;
     
@@ -58,15 +58,14 @@ public class GameState extends State //Este cambio se hizo para tener el control
     private Chronometer gameOverTimer;
     private boolean gameOver;
     
+    
     public GameState()
     {
-        //Eligimos los avatares 
-        Player.avatar = (int)(Math.random()*Assets.players.length);
         
         //player = new Player(new Vector2D(400, 250), new Vector2D(0,0), 7, Assets.player, this);
-        player = new Player(new Vector2D(Constant.WIDTH/2 - Assets.players[Player.avatar].getWidth()/2,
-				Constant.HEIGHT/2 - Assets.players[Player.avatar].getHeight()/2), new Vector2D(),
-				Constant.PLAYER_MAX_VEL, Assets.players[Player.avatar], this);
+        player = new Player(new Vector2D(Constant.WIDTH/2 - Assets.players[ChooseShip.avatar].getWidth()/2,
+				Constant.HEIGHT/2 - Assets.players[ChooseShip.avatar].getHeight()/2), new Vector2D(),
+				Constant.PLAYER_MAX_VEL, Assets.players[ChooseShip.avatar], this);
         
         gameOverTimer = new Chronometer();
 	gameOver = false;
@@ -93,7 +92,7 @@ public class GameState extends State //Este cambio se hizo para tener el control
     public void addScore( int value, Vector2D position ) //Esta posicion es del objeto que se destruyo
     {
         score += value;
-        messages.add(new Message(position, true, "+"+value+" score", Color.WHITE, false, Assets.fontMed, this));
+        messages.add(new Message(position, true, "+"+value+" score", Color.WHITE, false, Assets.fontMed));
     }
 
     //Para dividir los meteoros
@@ -141,7 +140,7 @@ public class GameState extends State //Este cambio se hizo para tener el control
     private void startWave()
     {
         messages.add(new Message( new Vector2D(Constant.WIDTH/2, Constant.HEIGHT/2), true,
-                    "WAVE "+ waves, Color.ORANGE, true, Assets.fontBig, this)); 
+                    "WAVE "+ waves, Color.ORANGE, true, Assets.fontBig)); 
         double x, y;
         
         for ( int i=0; i < meteors; i++)
@@ -162,7 +161,7 @@ public class GameState extends State //Este cambio se hizo para tener el control
         }
 
         meteors ++;
-        spawnUfo();
+        //spawnUfo();   //Se quita esto pues ya se establecio de una mejor manera la creacion de enemigos cada 10 segundos
         waves++;
     }
     //Agregar animaciones a un arreglo
@@ -220,7 +219,6 @@ public class GameState extends State //Este cambio se hizo para tener el control
                 path, //Camino 
                 this  //estado de juego
                 ));
-            
     }
     
     @Override
@@ -236,9 +234,8 @@ public class GameState extends State //Este cambio se hizo para tener el control
             if(movingObject.isDead()) {
                 movingObjects.remove(i); //Y aqui es el incremento de eficiencia cuando 
                                          //ya se esta pasando el índice del objeto a destruir   //CAP-21
-                i--;
+                i--; //Se tiene que restar una posicion pues esta ya fue eliminada
             }
-
         }
 
         //Para actualizar las animaciones
@@ -276,7 +273,6 @@ public class GameState extends State //Este cambio se hizo para tener el control
 
         //Si no hay ningun meteoro iniciamos la nueva oleada
         startWave();
-
     }
 
     @Override
@@ -355,7 +351,6 @@ public class GameState extends State //Este cambio se hizo para tener el control
                             (int)pos.getX() + 60, (int)pos.getY() + 5, null);
             pos.setX(pos.getX() + 20);
         }
-
 }
     
     public ArrayList<MovingObject> getMovingObjects() 
@@ -380,10 +375,9 @@ public class GameState extends State //Este cambio se hizo para tener el control
                 PLAYER_START_POSITION,
                 true,
                 "GAMEOVER",
-                Color.MAGENTA,
+                Color.GREEN,
                 true,
-                Assets.fontBig,
-                this);
+                Assets.fontBig);
         
         this.messages.add(gameOverMsg);
         gameOverTimer.run(Constant.GAME_OVER_TIME);

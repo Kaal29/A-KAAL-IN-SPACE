@@ -18,6 +18,7 @@ import Graphics.Assets;
 import Graphics.Sound;
 import Input.KeyBoard;
 import Math.Vector2D;
+import States.ChooseShip;
 import States.GameState;
 
 public class Player extends MovingObject
@@ -42,7 +43,7 @@ public class Player extends MovingObject
     //flickerTime para el cambio entre visible y no visible
     
     //Para saber con que avatar estamos jugando
-    public static int avatar;
+    
     
     //sound
     private Sound shoot, loose;
@@ -163,8 +164,8 @@ public class Player extends MovingObject
 		
         angle = 0;
         velocity = new Vector2D();
-        position = new Vector2D(Constant.WIDTH/2 - Assets.players[Player.avatar].getWidth()/2,
-                        Constant.HEIGHT/2 - Assets.players[Player.avatar].getHeight()/2);
+        position = new Vector2D(Constant.WIDTH/2 - Assets.players[ChooseShip.avatar].getWidth()/2,
+                        Constant.HEIGHT/2 - Assets.players[0].getHeight()/2);
 	}
     
     @Override

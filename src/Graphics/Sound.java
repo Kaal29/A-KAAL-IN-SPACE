@@ -32,7 +32,7 @@ public class Sound
     //Para la musica de fondo
     public void loop()
     {
-        clip.setFramePosition(0);
+        clip.setFramePosition(100000);  //La musica de fondo esta retrasada 
         clip.loop(Clip.LOOP_CONTINUOUSLY);  //Loop requiere de una constante (default)
     }
     

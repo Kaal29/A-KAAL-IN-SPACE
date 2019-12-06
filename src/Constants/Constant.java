@@ -7,6 +7,9 @@ package Constants;
  * @date   23/11/2019
  * @time   03:26 pm
  */
+
+import javax.swing.filechooser.FileSystemView;
+
 public class Constant 
 {
     //Frame dimensiones
@@ -15,7 +18,7 @@ public class Constant
     //Player properties
     public static final int FIRERATE = 200 ; //TIEMPO DE DISPARO
     public static final double ACC = 0.2; //0.2//Velocidad de movimiento
-    public static final double DELTAANGLE = 0.05; //Angulo de rotacion
+    public static final double DELTAANGLE = 0.035; //Angulo de rotacion
     public static final double PLAYER_MAX_VEL = 10; //Velocidad maxima de desplazamiento
     public static final long SPAWING_TIME = 3000;
     public static final long FLICKER_TIME = 200;
@@ -36,12 +39,30 @@ public class Constant
     public static final int UFO_FIRE_RATE = 1000;
     public static final double UFO_ANGLE_RANGE = Math.PI/2;
     public static final int UFO_SCORE = 40;
-    public static final long UFO_SPAWN_RATE = 10000; //Para que cada 10 segundos cree un nuevo Ufo
+    public static final long UFO_SPAWN_RATE = 20000; //Para que cada 10 segundos cree un nuevo Ufo (10000)
     
+    //Para nombre de los botones 
     public static final String PLAY = "PLAY";
-	
+    public static final String OPTIONS = "OPTIONS";
+    public static final String CHOOSE_SHIP = "CHOOSE SHIP";
+    public static final String BACK = "BACK";
+    public static final String NEXT = "NEXT";
+    public static final String HIGH_SCORES = "HIGHEST SCORES";
     public static final String EXIT = "EXIT";
+    public static final String RETURN = "RETURN";
     
-    public static final int LOADING_BAR_WIDTH = 500;
-    public static final int LOADING_BAR_HEIGHT = 50; 
+    //para el score
+    public static final String SCORE = "SCORE";
+    public static final String DATE = "DATE";
+    
+    public static final int LOADING_BAR_WIDTH = 500; //Ancho de la barra de carga
+    public static final int LOADING_BAR_HEIGHT = 50; //Altura
+
+    //Para poder usar JSON
+    public static final String SCORE_PATH = FileSystemView.getFileSystemView().getDefaultDirectory().getPath() +
+			"\\DATOS\\data.json"; // data.xml if you use XMLParser
+	
+    // Estas variables son requeridas para usar XMLParse
+    //public static final String PLAYER = "PLAYER";
+    //public static final String PLAYERS = "PLAYERS";
 }

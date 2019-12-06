@@ -13,7 +13,6 @@ import javax.imageio.ImageIO;
 import java.awt.Font;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.AudioSystem;
-import javax.swing.ImageIcon;
 
 import java.io.IOException;
 import java.awt.FontFormatException;

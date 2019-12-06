@@ -20,7 +20,7 @@ import Constants.Constant;
 import Graphics.Assets;
 import Input.KeyBoard;
 import Input.MouseInput;
-import States.GameState;
+import States.LoadingState;
 import States.MenuState;
 
 import States.State;
@@ -50,7 +50,7 @@ public class Window extends JFrame implements Runnable{
     public Window()
     {
          numberScreen = (int)(Math.random()*Assets.screens.length);
-        setTitle("IRONMAN KAAL");
+        setTitle("A KAAL IN SPACE");
         setSize(Constant.WIDTH, Constant.HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
@@ -112,12 +112,20 @@ public class Window extends JFrame implements Runnable{
 
     private void init()
     {
-            Assets.init();
-            
-            //De la clase State su objeto empieza siendo nulo
-            //entonces
-            //Sirve para hacer modificaciones sin meternos con la logica del juego
-            State.changeState(new MenuState());
+        // ya que aquí empieza todo, se agrega el hilo para generar la barra de carga
+        Thread loadingThread = new Thread( new Runnable() { //Y este hilo se inicia desde el constructor de la clase LoadingState
+
+            @Override
+            public void run()
+            {
+                Assets.init();
+            }
+        });
+        
+        //De la clase State su objeto empieza siendo nulo
+        //entonces
+        //Sirve para hacer modificaciones sin meternos con la logica del juego
+        State.changeState(new LoadingState(loadingThread));
                     
     }
     

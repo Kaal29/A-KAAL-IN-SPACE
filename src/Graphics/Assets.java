@@ -15,10 +15,17 @@ import javax.swing.ImageIcon;
 
 public class Assets {
 	
+    //Para que indique si ya todos los recursos cargaron
+    public static boolean loaded = false;
+    //Para saber cuanto lleva de carga y asi poder dibujar la barra
+    public static float count = 0;
+    //Cantidad total de recursos
+    public static float MAX_COUNT = 900; //93 cantidad de archivos, método poco eficaz 
+    
     //Effects
     public static BufferedImage speed;
     
-    public static BufferedImage[] players = new BufferedImage[18];
+    public static BufferedImage[] players = new BufferedImage[20];
 
     //Explosion
     public static BufferedImage[] exp = new BufferedImage[9];
@@ -60,51 +67,74 @@ public class Assets {
     public static void init()
     {
         
-        speed  = Loader.ImageLoader("/effects/0.png");
-        for(int i=0; i<lasers.length;i++)
-            lasers[i] = Loader.ImageLoader("/lasers/"+i+".png");
-        
-        life = Loader.ImageLoader("/life/life.jpg");
-        
-        fontBig = Loader.loadFont("/fonts/futureFont.ttf", 42);
-        fontMed = Loader.loadFont("/fonts/futureFont.ttf", 20);
-        
-        for(int i=0; i<screens.length;i++)
-            screens[i] = Loader.ImageLoader("/fonts/fond"+i+".jpg");
-        
-        for(int i=0; i<players.length;i++)
-           players[i] = Loader.ImageLoader("/ships/"+i+".png");
-        
-        for(int i=0; i<bigs.length;i++)
-           bigs[i] = Loader.ImageLoader("/meteors/big/big"+(i+1)+".png");
-           
-        for(int i=0; i<meds.length;i++)
-            meds[i] = Loader.ImageLoader("/meteors/med/"+i+".png");
-        
-        for(int i=0; i<smalls.length;i++)
-            smalls[i] = Loader.ImageLoader("/meteors/small/"+i+".png");
-       
-        //for(int i=0; i<tinies.length;i++)
-           //tinies[i] = Loader.ImageLoader("/meteors/tiny/tiny"+(i+1)+".png");
-        
-        for(int i=0; i<exp.length;i++)
-            exp[i] = Loader.ImageLoader("/explosion/"+i+".png");
-        
-        for(int i=0; i<ufo.length;i++)
-            ufo[i] = Loader.ImageLoader("/enemy/enemy"+i+".png");
-            
-        for(int i = 0; i < numbers.length; i++)
-            numbers[i] = Loader.ImageLoader("/numbers/"+i+".png");
-        
-        backgroundMusic = Loader.loadSound("/sounds/fondo3.wav");
-        explosion = Loader.loadSound("/sounds/explosion.wav");
-        playerLoose = Loader.loadSound("/sounds/playerLoose.wav");
-        playerShoot = Loader.loadSound("/sounds/playerShoot.wav");
-        ufoShoot = Loader.loadSound("/sounds/ufoShoot.wav");
-        
-       
-        greyBtn = Loader.ImageLoader("/ui/grey_button.png");
-	blueBtn = Loader.ImageLoader("/ui/blue_button.png");
+        for (int j =0; j<10; j++)
+        {
+            speed  = loadImage("/effects/0.png");
+            for(int i=0; i<lasers.length;i++)
+                lasers[i] = loadImage("/lasers/"+i+".png");
+
+            life = loadImage("/life/life.jpg");
+
+            fontBig = loadFont("/fonts/futureFont.ttf", 60);
+            fontMed = loadFont("/fonts/futureFont.ttf", 20);
+
+            for(int i=0; i<screens.length;i++)
+                screens[i] = loadImage("/fonts/fond"+i+".jpg");
+                
+            for(int i=0; i<players.length;i++)
+               players[i] = loadImage("/ships/"+i+".png");
+
+            for(int i=0; i<bigs.length;i++)
+               bigs[i] = loadImage("/meteors/big/big"+(i+1)+".png");
+
+            for(int i=0; i<meds.length;i++)
+                meds[i] = loadImage("/meteors/med/"+i+".png");
+
+            for(int i=0; i<smalls.length;i++)
+                smalls[i] = loadImage("/meteors/small/"+i+".png");
+
+            //for(int i=0; i<tinies.length;i++)
+               //tinies[i] = Loader.ImageLoader("/meteors/tiny/tiny"+(i+1)+".png");
+
+            for(int i=0; i<exp.length;i++)
+                exp[i] = loadImage("/explosion/"+i+".png");
+
+            for(int i=0; i<ufo.length;i++)
+                ufo[i] = loadImage("/enemy/enemy"+i+".png");
+
+            for(int i = 0; i < numbers.length; i++)
+                numbers[i] = loadImage("/numbers/"+i+".png");
+
+            backgroundMusic = loadClip("/sounds/fondo3.wav");
+            explosion = loadClip("/sounds/explosion.wav");
+            playerLoose = loadClip("/sounds/playerLoose.wav");
+            playerShoot = loadClip("/sounds/playerShoot.wav");
+            ufoShoot = loadClip("/sounds/ufoShoot.wav");
+
+
+            greyBtn = loadImage("/ui/grey_button.png");
+            blueBtn = loadImage("/ui/blue_button.png");
+    
+        }
+        //cargamos los recursos unas 10 veces para que se pueda ver la barra
+        loaded = true;
+    }
+    
+    public static BufferedImage loadImage( String path)
+    {
+        count++;
+        return Loader.ImageLoader(path);
     }
 	
+    public static Font loadFont( String path, int size)
+    {
+        count++;
+        return Loader.loadFont(path, size);
+    }
+    
+    public static Clip loadClip( String path)
+    {
+        count++;
+        return Loader.loadSound(path);
+    }
 }

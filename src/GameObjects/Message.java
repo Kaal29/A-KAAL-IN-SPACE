@@ -1,13 +1,13 @@
 
 package GameObjects;
 
-import Graphics.Text;
-import Math.Vector2D;
-import States.GameState;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+
+import Graphics.Text;
+import Math.Vector2D;
 
 /**
  *
@@ -29,13 +29,14 @@ public class Message
     private boolean center;
     private boolean fade; //Efecto de aparecer <- contrario de fade
     private Font font;
-    private final float deltaAlpha = 0.01f; //Mientras mas rapido mas rapido de desvanece
+    private final float deltaAlpha = 0.01f; //Mientras mas grande mas rapido de desvanece
     private boolean dead;
         
     public Message(Vector2D position, boolean fade, String text, Color color,
-                    boolean center, Font font, GameState gameState) {
+                    boolean center, Font font /**GameState gameState*/) {/**GameState gameState*/ //Se quita esto pues ya se esta
+                                                                           //haciendo uso de dead y ya no se usa GameState
             this.font = font;
-            //this.gameState = gameState; rfeamplasa la variable dead
+            //this.gameState = gameState; remplasado por la variable dead
             this.text = text;
             this.position = position;
             this.fade = fade;
@@ -57,7 +58,7 @@ public class Message
 
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
 
-        position.setY(position.getY() - 1);
+        position.setY(position.getY() -1 );
 
         if(fade)
                 alpha -= deltaAlpha;
