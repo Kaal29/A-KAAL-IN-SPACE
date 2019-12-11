@@ -8,13 +8,14 @@ package GameObjects;
  * @time   10:24 am
  */
 
-import Constants.Constant;
-import Math.Vector2D;
-import States.GameState;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+
+import Constants.Constant;
+import Math.Vector2D;
+import States.GameState;
 
 public class Laser extends MovingObject
 {
@@ -32,8 +33,11 @@ public class Laser extends MovingObject
         if (position.getX()<0 || position.getX()>Constant.WIDTH || 
                 position.getY()<0 || position.getY() >Constant.HEIGHT)
         {
-            gameState.getMovingObjects().remove(this);
+            destroy();
         }
+        
+        collidesWith();
+        
     }
 
     @Override
@@ -41,11 +45,18 @@ public class Laser extends MovingObject
     {
         Graphics2D g2d = (Graphics2D)g;
         
-        at = AffineTransform.getTranslateInstance(position.getX(), position.getY());
-        at.rotate(angle);
+        at = AffineTransform.getTranslateInstance(position.getX()-width/2, position.getY());
+        at.rotate(angle, width/2,0);
         
         g2d.drawImage(texture, at, null);
     
+    }
+    
+    //sobrescribir el método de MovingObject ya que el laser se calcula la colision de manera diferente
+    @Override
+    protected Vector2D getCenter()
+    {
+        return new Vector2D(position.getX() + width/2, position.getY() + width/2 );
     }
 
 }

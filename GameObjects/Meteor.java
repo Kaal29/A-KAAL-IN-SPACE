@@ -1,13 +1,14 @@
 
 package GameObjects;
 
-import Constants.Constant;
-import Math.Vector2D;
-import States.GameState;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+
+import Constants.Constant;
+import Math.Vector2D;
+import States.GameState;
 
 /**
  *
@@ -15,12 +16,17 @@ import java.awt.image.BufferedImage;
  * @date   22/11/2019
  * @time   11:21 pm
  */
+
 public class Meteor extends MovingObject
 {
     private Size size;
+    
     public Meteor(Vector2D position, Vector2D velocity, double maxVel, BufferedImage texture, GameState gameState, Size size) {
         super(position, velocity, maxVel, texture, gameState);
         this.size= size;
+        
+        //Para escalonar el vector velocity
+        this.velocity = velocity.scale(maxVel);
     }
 
     @Override
@@ -28,21 +34,28 @@ public class Meteor extends MovingObject
     {
         position = position.add(velocity);
         
-        if (position.getX() >= Constant.WIDTH)
-           position.setX(0);
-        
-        if (position.getY() > Constant.HEIGHT)
-           position.setY(0);
-        
-        if (position.getX() <= Constant.WIDTH)
-           position.setX(0);
-        
-        if (position.getY() <= 0)
-           position.setY(Constant.HEIGHT);
-        
+        if(position.getX() > Constant.WIDTH)
+            position.setX(-width);
+        if(position.getY() > Constant.HEIGHT)
+            position.setY(-height);
+
+        if(position.getX() < -width)
+            position.setX(Constant.WIDTH);
+        if(position.getY() < -height)
+            position.setY(Constant.HEIGHT);
+
         angle += Constant.DELTAANGLE/2;
     }
 
+    @Override
+    public void destroy()
+    {
+        gameState.divideMeteor(this);
+        gameState.addScore(Constant.METEOR_SCORE, position);
+        super.destroy();
+    }
+            
+            
     @Override
     public void draw(Graphics g) 
     {
@@ -55,7 +68,7 @@ public class Meteor extends MovingObject
         
     }
     
-    public Size getSise()
+    public Size getSize()
     {
         return size;
     }
